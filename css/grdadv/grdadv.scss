@@ -1,0 +1,107 @@
+@use "sass:math";
+
+$total-columns: 12 !default;
+$total-detail-columns: 60 !default;
+
+@mixin grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@mixin cell {
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.Grid {
+  @include grid;
+}
+.Grid.\-full-w {
+  width: 100%;
+}
+.Grid.\-full-h {
+  height: 100%;
+}
+.Grid.\-max-w-1 {
+  max-width: 100%;
+}
+.Grid.\-max-h-1 {
+  max-height: 100%;
+}
+.Grid.\-vertical {
+  flex-direction: column;
+}
+// Align
+.Grid.\-top {
+  align-items: flex-start;
+}
+.Grid.\-middle {
+  align-items: center;
+}
+.Grid.\-bottom {
+  align-items: flex-end;
+}
+.Grid.\-stretch {
+  align-items: stretch;
+}
+.Grid.\-baseline {
+  align-items: baseline;
+}
+// Justify
+.Grid.\-left {
+  justify-content: flex-start;
+}
+.Grid.\-center {
+  justify-content: center;
+}
+.Grid.\-right {
+  justify-content: flex-end;
+}
+.Grid.\-between {
+  justify-content: space-between;
+}
+.Grid.\-around {
+  justify-content: space-around;
+}
+
+.Cell {
+  @include cell;
+}
+.Grid:not(.\-vertical) > .Cell.\-fill {
+  width: 0;
+  min-width: 0;
+  flex-grow: 1;
+}
+.Grid.\-vertical > .Cell.\-fill {
+  height: 0;
+  min-height: 0;
+  flex-grow: 1;
+}
+
+// @for $index from 1 through $total-columns {
+//   .Grid:not(.\-vertical) > .Cell.\-#{$index}of#{$total-columns} {
+//     width: percentage(math.div($index, $total-columns));
+//   }
+//   .Grid.\-vertical > .Cell.\-#{$index}of#{$total-columns} {
+//     height: percentage(math.div($index, $total-columns));
+//   }
+// }
+// @for $index from 1 through $total-detail-columns {
+//   .Grid:not(.\-vertical) > .Cell.\-#{$index}of#{$total-detail-columns} {
+//     width: percentage(math.div($index, $total-detail-columns));
+//   }
+//   .Grid.\-vertical > .Cell.\-#{$index}of#{$total-detail-columns} {
+//     height: percentage(math.div($index, $total-detail-columns));
+//   }
+// }
+
+@for $tc from 1 through 100 {
+  @for $index from 1 through $tc {
+    .Grid:not(.\-vertical) > .Cell.\-#{$index}of#{$tc} {
+      width: percentage(math.div($index, $tc));
+    }
+    .Grid.\-vertical > .Cell.\-#{$index}of#{$tc} {
+      height: percentage(math.div($index, $tc));
+    }
+  }
+}

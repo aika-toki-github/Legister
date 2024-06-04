@@ -1,0 +1,116 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Zen+Antique&display=swap");
+:root {
+  --font-serif: "Zen Antique", "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "ＭＳ Ｐ明朝", "MS PMincho", serif;
+  --font-mono: "Courier Prime", "Source Han Code JP", "Menlo", "Monaco", "Consolas", monospace;
+}
+
+html {
+  overflow: hidden;
+}
+
+body {
+  overflow: hidden;
+  font-size: 50px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  font-family: var(--font-serif);
+}
+
+#overlay {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  width: 100vw;
+  height: 100vh;
+  background-image: linear-gradient(30deg, #fff, #88aaff);
+  align-items: center;
+  justify-content: center;
+}
+#overlay.show {
+  display: flex;
+}
+
+#container {
+  width: 1440px;
+  height: 900px;
+  padding: 0;
+}
+
+#container > .Grid {
+  height: 900px;
+}
+
+.trace {
+  background-image: url(../16_20240524220654.png);
+  background-size: cover;
+  z-index: -99;
+  width: 99.7%;
+  height: 100%;
+  opacity: 0.1;
+}
+
+[data-bs-theme=dark] .trace {
+  filter: invert(1);
+}
+
+.ol {
+  position: fixed;
+  width: 1440px;
+  height: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: -99;
+}
+
+#keypad > .Cell {
+  align-content: center;
+}
+#keypad > .Cell.numpad {
+  font-size: 80px;
+}
+
+.\-2lines {
+  font-size: 40px;
+  line-height: 44px;
+}
+
+.child-align-center > * {
+  align-content: center;
+}
+
+#product {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#product > .Cell:has(.Grid > .Cell:empty) {
+  display: none;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.interaction {
+  background-color: var(--bs-body-bg);
+  cursor: pointer;
+}
+.interaction:hover {
+  background-color: var(--bs-tertiary-color);
+}
+
+.purchasableProductItem {
+  --bs-btn-font-size: 43px;
+}
+
+.price {
+  font-family: var(--font-mono);
+}
+
+#controller > .Cell:not(.no-border):not(.\-2lines) {
+  font-size: 50px;
+}/*# sourceMappingURL=style.css.map */
