@@ -36,7 +36,7 @@
                     <div class="btn btn-secondary Cell -3of12 numpad flex-center">1</div>
                     <div class="btn btn-secondary Cell -3of12 numpad flex-center">2</div>
                     <div class="btn btn-secondary Cell -3of12 numpad flex-center">3</div>
-                    <div class="btn btn-secondary Cell -3of12 -2lines flex-center">商品<br />追加</div>
+                    <div class="btn btn-primary Cell -3of12 -2lines flex-center" id="addToBasket">商品<br />追加</div>
                     <div class="btn btn-secondary Cell -3of12 numpad flex-center">4</div>
                     <div class="btn btn-secondary Cell -3of12 numpad flex-center">5</div>
                     <div class="btn btn-secondary Cell -3of12 numpad flex-center">6</div>
@@ -49,7 +49,7 @@
                 </div>
                 <div class="Cell -12of60 no-border">
                   <div class="Grid -right -stretch -vertical -full-h text-center child-align-center" id="controller">
-                    <div class="btn btn-primary Cell -3of12 flex-center border-5">決定</div>
+                    <div class="btn btn-warning Cell -3of12 flex-center border-5">決定</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
                     <div class="btn btn-secondary Cell -3of12 flex-center border-5">会計</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
@@ -60,24 +60,31 @@
               </div>
             </div>
             <div class="Cell -fill">
-              <div class="Grid -max-h-1 -stretch -around -full-w" id="product" data-selected-id=""></div>
+              <div class="list-group list-group-flush mh-100" id="product" data-selected-id=""></div>
             </div>
           </div>
         </div>
         <div class="Cell -1of2">
           <div class="Grid -vertical -full-h -stretch -around">
-            <div class="Cell -1of10 no-border" id="menu">
-              <div class="Grid -middle -right -full-h">
-                <div class="Cell -1of6 text-center border-5">売上</div>
+            <div class="Cell -1of10 no-border">
+              <div class="Grid -middle -right -full-h" id="menu">
+                <div class="Cell -1of6 text-center border-5 btn btn-secondary">売上</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
-                <div class="Cell -1of6 text-center border-5">説明</div>
+                <div class="Cell -1of6 text-center border-5 btn btn-secondary">説明</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
               </div>
             </div>
             <div class="Cell -8of10 no-border">
               <div class="Grid -center -stretch -full-h">
                 <div class="Cell -8of9 border-3">
-                  <div class="Grid -center -full-h" id="cart"></div>
+                  <div class="Grid -center" id="receipt">
+                    <div class="Cell -1of1 no-border">
+                      <div class="Grid -center" id="basket"></div>
+                    </div>
+                    <div class="Cell -1of40 no-border keep-blank my-3"></div>
+                    <div class="Cell -19of20 no-border border-top border-5 keep-blank my-3"></div>
+                    <div class="Cell -1of40 no-border keep-blank my-3"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -86,7 +93,7 @@
       </div>
     </div>
     <template id="purchasableProductItem">
-      <div class="Cell -1of1 border btn btn-secondary purchasableProductItem" data-product-id="">
+      <btn class="list-group-item list-group-item-action list-group-item-primary" data-product-id="">
         <div class="Grid -middle -between -full-w pe-none">
           <div class="Cell -17of24 no-border text-start overflow-x-hidden pe-none" id="productName" keep-blank></div>
           <div class="Cell -13of48 no-border pe-none price">
@@ -96,7 +103,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </btn>
     </template>
     <template id="cartProductItem">
       <div class="Cell -1of1 text-center no-border">

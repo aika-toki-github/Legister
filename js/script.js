@@ -22,6 +22,7 @@ async function setup() {
   avoidBlank(".Cell:not([keep-blank]):not(.keep-blank)");
   dataSync();
   setInterval(dataSync, 1000 * 30);
+  document.querySelector("#addToBasket").addEventListener("click", addToBasket);
 }
 function dataSync() {
   Logger("Syncing data...");
@@ -91,12 +92,24 @@ function addProduct(name, price) {
   saveData();
 }
 function purchaseSelect(e) {
-  [...product.querySelectorAll(".btn-primary")].forEach((e) => {
-    e.classList.add("btn-secondary");
-    e.classList.remove("btn-primary");
-  });
-  e.classList.remove("btn-secondary");
-  e.classList.add("btn-primary");
+  e.classList.add("active");
+  // [...product.querySelectorAll(".btn-primary")].forEach((e) => {
+  //   e.classList.add("btn-outline-secondary");
+  //   e.classList.remove("btn-primary");
+  // });
+  // e.classList.remove("btn-outline-secondary");
+  // e.classList.add("btn-primary");
   product.dataset.selectedId = e.dataset.productId;
   console.log(e);
+}
+function purchaseSelectionReset() {
+  [...product.querySelectorAll(".active")].forEach((e) => {
+    e.classList.remove("active");
+  });
+  product.dataset.selectedId = "";
+}
+function addToBasket() {
+  let element = cloneTemplate("cartProductItem");
+  document.querySelector("#basket").append(element);
+  return;
 }

@@ -95,6 +95,7 @@ body {
 .price {
   font-family: var(--font-mono);
 }
-#controller > .Cell:not(.no-border):not(.\-2lines) {
-  font-size: 50px;
+#controller > .Cell:not(.no-border):not(.\-2lines),
+#menu > .Cell:not(.no-border):not(.\-2lines) {
+  font-size: 40px;
 }
