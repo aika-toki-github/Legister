@@ -23,9 +23,9 @@
       </div>
     </div>
     <div class="container-fluid" id="container">
-      <div class="ol" style="/*display: none;*/">
+      <!-- <div class="ol" style="/*display: none;*/">
         <div class="trace"></div>
-      </div>
+      </div> -->
       <div class="Grid -stretch -between">
         <div class="Cell -29of60 no-border">
           <div class="Grid -stretch -vertical -full-h">
@@ -33,25 +33,25 @@
               <div class="Grid -stretch -around -full-h">
                 <div class="Cell -42of60 no-border">
                   <div class="Grid -stretch -full-h text-center" id="keypad">
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">1</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">2</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">3</div>
-                    <div class="btn btn-primary Cell -3of12 -2lines flex-center" id="addToBasket">商品<br />追加</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">4</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">5</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">6</div>
-                    <div class="btn btn-danger Cell -3of12 -2lines flex-center">選択<br />取消</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">7</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">8</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">9</div>
-                    <div class="btn btn-secondary Cell -3of12 numpad flex-center">0</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="1">1</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="2">2</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="3">3</div>
+                    <div class="btn btn-primary Cell -3of12 -2lines flex-center" id="b_addToBasket">商品<br />追加</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="4">4</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="5">5</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="6">6</div>
+                    <div class="btn btn-danger Cell -3of12 -2lines flex-center" id="b_cancel">カゴ<br />取消</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="7">7</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="8">8</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="9">9</div>
+                    <div class="btn btn-secondary Cell -3of12 numpad flex-center" data-num="0">0</div>
                   </div>
                 </div>
                 <div class="Cell -12of60 no-border">
                   <div class="Grid -right -stretch -vertical -full-h text-center child-align-center" id="controller">
-                    <div class="btn btn-warning Cell -3of12 flex-center border-5">決定</div>
+                    <div class="btn btn-warning Cell -3of12 flex-center border-5" id="b_payment">決定</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
-                    <div class="btn btn-secondary Cell -3of12 flex-center border-5">会計</div>
+                    <div class="btn btn-secondary Cell -3of12 flex-center border-5" id="b_checkout">会計</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
                     <div class="btn btn-secondary Cell -3of12 -2lines flex-center border-5">商品<br />編集</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
@@ -60,30 +60,48 @@
               </div>
             </div>
             <div class="Cell -fill">
-              <div class="list-group list-group-flush mh-100" id="product" data-selected-id=""></div>
+              <div class="list-group list-group-flush mh-100" id="product" data-selected-id="" data-count=""></div>
             </div>
           </div>
         </div>
         <div class="Cell -1of2">
-          <div class="Grid -vertical -full-h -stretch -around">
-            <div class="Cell -1of10 no-border">
+          <div class="Grid -vertical h-100 mh-100 -stretch -around">
+            <div class="Cell -2of10 no-border">
               <div class="Grid -middle -right -full-h" id="menu">
+                <div class="Cell -1of6 text-center border-5 btn btn-secondary hidden" id="b_debug">d</div>
+                <div class="Cell -2of60 no-border keep-blank"></div>
                 <div class="Cell -1of6 text-center border-5 btn btn-secondary">売上</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
-                <div class="Cell -1of6 text-center border-5 btn btn-secondary">説明</div>
+                <div class="Cell -1of6 text-center border-5 btn btn-secondary" id="b_new">新規</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
               </div>
             </div>
-            <div class="Cell -8of10 no-border">
-              <div class="Grid -center -stretch -full-h">
-                <div class="Cell -8of9 border-3 overflow-y-auto">
-                  <div class="Grid -center mh-100" id="receipt">
-                    <div class="Cell -1of1 no-border">
-                      <div class="Grid -center" id="basket"></div>
-                    </div>
-                    <div class="Cell -1of40 no-border keep-blank my-3"></div>
-                    <div class="Cell -19of20 no-border border-top border-5 keep-blank my-3"></div>
-                    <div class="Cell -1of40 no-border keep-blank my-3"></div>
+            <div class="Cell -fill no-border mh-100 overflow-y-auto">
+              <div class="list-group list-group-flush mx-4 border border-3" style="--bs-list-group-border-width: 0" id="receipt">
+                <div class="list-group-item">
+                  <div class="list-group list-group-flush mh-100" style="--bs-list-group-border-width: 0" id="basket"></div>
+                </div>
+                <div class="list-group-item">
+                  <div class="Grid -middle -center">
+                    <div class="Cell -19of20 no-border border-top border-5 keep-blank my-2"></div>
+                  </div>
+                </div>
+                <div class="list-group-item total">
+                  <div class="Grid -middle -around">
+                    <div class="Cell -2of5 no-border text-start">合計</div>
+                    <div class="Cell -2of5 no-border text-end" id="total">¥0</div>
+                  </div>
+                </div>
+                <div class="list-group-item payment hidden">
+                  <div class="Grid -middle -around">
+                    <div class="Cell -2of5 no-border text-start">お預かり</div>
+                    <div class="Cell -2of5 no-border text-end" id="t_payment" data-payment="">¥0</div>
+                  </div>
+                </div>
+                <div class="list-group-item change hidden">
+                  <div class="Grid -middle -around">
+                    <div class="Cell -2of5 no-border text-start">お釣り</div>
+                    <div class="Cell -2of5 no-border text-end" id="t_change">¥0</div>
                   </div>
                 </div>
               </div>
@@ -98,16 +116,16 @@
           <div class="Cell -17of24 no-border text-start overflow-x-hidden pe-none" id="productName" keep-blank></div>
           <div class="Cell -13of48 no-border pe-none price">
             <div class="Grid -between -stretch">
-              <div class="Cell -1of12 no-border text-start">¥</div>
+              <div class="Cell -1of12 no-border text-start yen-symbol">¥</div>
               <div class="Cell -11of12 keep-blank no-border text-end" id="productPrice"></div>
             </div>
           </div>
         </div>
       </btn>
     </template>
-    <template id="cartProductItem">
-      <div class="Cell -1of1 text-center no-border">
-        <div class="Grid -around">
+    <template id="basketProductItem">
+      <div class="list-group-item">
+        <div class="Grid -middle -around">
           <div class="Cell -1of20 no-border keep-blank flex-center" id="selectbox">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px">
               <path
@@ -116,9 +134,11 @@
                 d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
             </svg>
           </div>
-          <div class="Cell -9of20 no-border keep-blank text-start overflow-x-hidden" id="product">商品名</div>
-          <div class="Cell -3of20 no-border keep-blank text-end" id="count">x2</div>
-          <div class="Cell -6of20 no-border keep-blank text-end" id="price">¥1,234</div>
+          <div class="Cell -11of20 no-border keep-blank text-start overflow-x-hidden d-flex align-items-center" id="name">商品名</div>
+          <div class="Cell -7of20 no-border keep-blank text-end" id="price">¥1,234</div>
+          <div class="Cell -2of20 no-border keep-blank on-multiple"></div>
+          <div class="Cell -10of20 no-border keep-blank text-start on-multiple" id="count">2点</div>
+          <div class="Cell -7of20 no-border keep-blank text-end on-multiple" id="productPrice">@1,234</div>
         </div>
       </div>
     </template>

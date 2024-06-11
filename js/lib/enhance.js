@@ -1,4 +1,4 @@
-let isDebug = Searchs()["debug"];
+let isDebug = Searchs()["debug"] == "true";
 iziToast.settings({
   timeout: 2500,
 });

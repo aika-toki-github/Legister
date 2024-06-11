@@ -1,8 +1,11 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Zen+Antique&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=LXGW+WenKai+Mono+TC&family=Zen+Kaku+Gothic+New&display=swap");
 :root {
   --font-serif: "Zen Antique", "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "ＭＳ Ｐ明朝", "MS PMincho", serif;
   --font-mono: "Courier Prime", "Source Han Code JP", "Menlo", "Monaco", "Consolas", monospace;
+  --font-mono-alt: "LXGW WenKai Mono TC", var(--bs-font-monospace);
+  --font-sans: "Zen Kaku Gothic New", var(--bs-font-sans-serif);
 }
 
 html {
@@ -88,6 +91,9 @@ body {
 #product > .Cell:has(.Grid > .Cell:empty) {
   display: none;
 }
+#product .active .yen-symbol {
+  opacity: 0;
+}
 
 .flex-center {
   display: flex;
@@ -114,4 +120,35 @@ body {
 #controller > .Cell:not(.no-border):not(.\-2lines),
 #menu > .Cell:not(.no-border):not(.\-2lines) {
   font-size: 40px;
+}
+
+#basket {
+  font-family: var(--font-sans);
+  font-size: 35px;
+}
+#basket #price,
+#basket #productPrice {
+  font-family: var(--font-mono-alt);
+}
+
+.total {
+  font-size: 70px;
+}
+
+.payment,
+.change {
+  font-size: 55px;
+}
+
+.overflow-y-auto {
+  overflow-y: scroll !important;
+}
+
+.hidden {
+  display: none;
+}
+
+.invisible {
+  opacity: 0;
+  pointer-events: none;
 }/*# sourceMappingURL=style.css.map */
