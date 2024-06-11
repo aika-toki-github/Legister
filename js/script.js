@@ -1,26 +1,30 @@
 let numInputType = "none";
 let isBasketModify = false;
-let products = [["商品名", 1234]];
-let receipts = [
-  [
-    [
-      ["商品名", 1234, 3],
-      ["商品名", 2345, 1],
-    ],
-    7000,
-  ],
-];
+let isProductModify = false;
+let isEarnings = false;
+let products = [];
+let receipts = [];
 let basketProducts = [];
 let updatedAt = "1970-1-1-9-0-0";
 window.onload = setup();
 async function setup() {
-  (await checkResolution()) ? removeClass("#overlay", "show") : addClass("#overlay", "show");
+  if (!checkResolution()) {
+    addClass("#overlay", "show");
+    return false;
+  }
   addClassBulk(".Cell:not(.no-border)", "border");
   // addClassBulk(".Cell:not(.no-border)", "border-secondary");
   document.querySelector("html").dataset.bsTheme = colorScheme("light", "dark");
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (_) => {
     document.querySelector("html").dataset.bsTheme = colorScheme("light", "dark");
   });
+  window.addEventListener(
+    "wheel",
+    (e) => {
+      !!(e.deltaY % 1) && e.preventDefault();
+    },
+    { passive: false }
+  );
   avoidBlank(".Cell:not([keep-blank]):not(.keep-blank)");
   dataSync();
   setInterval(dataSync, 1000 * 30);
@@ -32,11 +36,25 @@ async function setup() {
   b_checkout.addEventListener("click", checkout);
   b_cancel.addEventListener("click", cancel);
   b_new.addEventListener("click", newPurchase);
+  b_reset.addEventListener("click", (e) => deleteData(""));
+  b_modifyProduct.addEventListener("click", (_) => {
+    toggleModifyProduct("enable");
+  });
+  b_backToMainFromProducts.addEventListener("click", (_) => {
+    toggleModifyProduct("disable");
+  });
+  b_earnings.addEventListener("click", (_) => {
+    toggleEarnings("enable");
+  });
+  b_backToMainFromEarnings.addEventListener("click", (_) => {
+    toggleEarnings("disable");
+  });
   buttonState(".numpad", false);
   buttonState("#b_addToBasket", false);
   buttonState("#b_checkout", false);
   buttonState("#b_payment", false);
   buttonState("#b_new", false);
+  buttonState("#b_cancel", false);
 }
 function dataSync() {
   Logger("Syncing data...");
@@ -77,6 +95,7 @@ function deleteData(param) {
     c = confirm("すべてのデータを消去しますか？");
   }
   if (c) {
+    toggleEarnings("disable");
     Logger("Removing data from storage...", "warn");
     Cookies.set("products", "", { expires: 0 });
     Cookies.set("receipts", "", { expires: 0 });
@@ -97,6 +116,10 @@ function addProduct(name, price) {
 function purchaseSelect(e) {
   if (e.dataset.productId == product.dataset.selectedId) {
     buttonState(".numpad,#b_addToBasket", false);
+    if (basketProducts.length == 0) {
+      buttonState("#b_modifyProduct", true);
+      buttonState("#b_cancel", false);
+    }
     purchaseSelectionReset();
     numInputType = "none";
     basketDisplay(true);
@@ -107,7 +130,8 @@ function purchaseSelect(e) {
   product.dataset.selectedId = e.dataset.productId;
   e.querySelector("#productPrice").textContent = 1;
   numInputType = "count";
-  buttonState(".numpad,#b_addToBasket", true);
+  buttonState("#b_modifyProduct", false);
+  buttonState(".numpad,#b_addToBasket,#b_cancel", true);
   basketDisplay(false);
   // console.log(e);
 }
@@ -120,6 +144,18 @@ function purchaseSelectionReset() {
   product.dataset.count = "";
   product.dataset.selectedId = "";
   numInputType = "none";
+}
+function basketSelect(e) {
+  if (e.classList.contains("active")) {
+    e.classList.remove("active");
+    e.querySelector("#checkbox").innerHTML = "";
+    e.querySelector("#checkbox").append(cloneTemplate("basketUncheck"));
+    return false;
+  }
+  e.classList.add("active");
+  e.querySelector("#checkbox").innerHTML = "";
+  e.querySelector("#checkbox").append(cloneTemplate("basketCheck"));
+  // console.log(e);
 }
 function inputNum(num) {
   switch (numInputType) {
@@ -146,7 +182,7 @@ function addToBasket() {
     return alert("選択を取り消す場合は製品をもう一度選択してください");
   }
   if (product.dataset.selectedId == "") return alert("商品が選択されていません");
-  basketProducts.push([product.dataset.selectedId, count]);
+  basketProducts.push([product.dataset.selectedId, count, uuidv7()]);
   purchaseSelectionReset();
   drawBasket();
   buttonState(".numpad,#b_addToBasket", false);
@@ -169,6 +205,42 @@ function drawProducts() {
   });
   purchaseSelectionReset();
 }
+function drawAllProducts() {
+  f_allProducts.hasChildNodes() && [...f_allProducts.children].forEach((e) => e.remove());
+  products.forEach((e, i) => {
+    let [id, name, price, enable] = e;
+    let element = cloneTemplate("productItem");
+    element.querySelector("#productName").value = name;
+    element.querySelector("#productPrice").value = price;
+    element.dataset.productId = id;
+    element.querySelector("#productState").addEventListener("click", (e) => {
+      toggleProductState(e.target);
+    });
+    element.querySelector("#productName").addEventListener("change", (e) => editProductName(e.target));
+    element.querySelector("#productPrice").addEventListener("change", (e) => editProductPrice(e.target));
+    if (!enable) {
+      element.querySelector("#productState").classList.remove("btn-danger");
+      element.querySelector("#productState").classList.add("btn-success");
+      element.querySelector("#productState").innerHTML = "";
+      element.querySelector("#productState").append(cloneTemplate("productEnable"));
+      element.querySelector("#productName").setAttribute("disabled", "");
+      element.querySelector("#productPrice").setAttribute("disabled", "");
+    } else {
+      element.querySelector("#productState").classList.remove("btn-success");
+      element.querySelector("#productState").classList.add("btn-danger");
+      element.querySelector("#productState").innerHTML = "";
+      element.querySelector("#productState").append(cloneTemplate("productDisable"));
+    }
+    f_allProducts.append(element);
+  });
+  let addbutton = cloneTemplate("productAdd");
+  addbutton.querySelector("#b_addProduct").addEventListener("click", addTemplateProduct);
+  f_allProducts.append(addbutton);
+}
+function addTemplateProduct() {
+  addProduct("商品名", 100);
+  drawAllProducts();
+}
 function drawBasket() {
   basket.hasChildNodes() && [...basket.children].forEach((e) => e.remove());
   let _total = 0;
@@ -179,7 +251,9 @@ function drawBasket() {
     element.querySelector("#price").textContent = "¥" + (e[1] * price).toLocaleString("en-us");
     element.querySelector("#count").textContent = e[1] + "点";
     element.querySelector("#productPrice").textContent = "@" + price.toLocaleString("en-us");
+    element.dataset.cacheId = e[2];
     if (e[1] == 1) [...element.querySelectorAll(".on-multiple")].forEach((e) => (e.style.display = "none"));
+    element.addEventListener("click", (e) => basketSelect(e.target));
     basket.append(element);
     _total += e[1] * price;
   });
@@ -195,6 +269,18 @@ function addExampleProduct(c = 1) {
 }
 function payment() {
   if (isBasketModify) {
+    [...basket.querySelectorAll(".active")].forEach((e) => {
+      basketProducts = arrayRemove(
+        basketProducts,
+        basketProducts.findIndex((v) => v[2] == e.dataset.cacheId)
+      );
+    });
+    drawBasket();
+    toggleBasketEditable("disable");
+    if (basketProducts.length == 0) {
+      buttonState("#b_cancel,#b_payment", false);
+      buttonState("#b_modifyProduct", true);
+    }
   } else {
     numInputType = "payment";
     // buttonState("#b_payment,#product>.list-group-item", false);
@@ -221,6 +307,9 @@ function checkout() {
 function cancel() {
   switch (numInputType) {
     case "count":
+      if (product.dataset.count == "") {
+        return alert("選択を取り消す場合は製品をもう一度選択してください");
+      }
       product.dataset.count = "";
       product.querySelector(".active #productPrice").textContent = 1;
       break;
@@ -229,7 +318,7 @@ function cancel() {
       t_payment.textContent = "¥" + Number(0).toLocaleString("en-us");
       break;
     case "none":
-      modifyBasket();
+      toggleBasketEditable();
       break;
   }
 }
@@ -239,10 +328,11 @@ function buttonState(target, state) {
   });
 }
 function newPurchase() {
-  receipts.push([basketProducts, Number(t_payment.dataset.payment)]);
+  receipts.push([basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
   saveData();
   basketDisplay(true);
-  buttonState("#b_cancel", true);
+  buttonState("#b_cancel,#b_modifyProduct", true);
+  buttonState("#b_new,#b_cancel", false);
   receipt.querySelector(".payment").classList.add("hidden");
   t_payment.dataset.payment = "";
   t_payment.textContent = "¥" + Number(0).toLocaleString("en-us");
@@ -274,6 +364,109 @@ function toggleProductsAvailable(force = "") {
       product.querySelector(".list-group-item").classList.contains("pe-none") ? toggleProductsAvailable("enable") : toggleProductsAvailable("disable");
       break;
   }
+}
+function toggleBasketEditable(force = "") {
+  switch (["disable", "enable"].indexOf(force.toLowerCase())) {
+    case 0:
+      isBasketModify = false;
+      removeClassBulk("#basket>.list-group-item", "list-group-item-danger");
+      removeClassBulk("#basket>.list-group-item", "active");
+      addClassBulk("#basket>.list-group-item", "pe-none");
+      toggleProductsAvailable("enable");
+      [...basket.querySelectorAll("#checkbox")].forEach((e) => {
+        e.innerHTML = "";
+        e.append(cloneTemplate("basketLock"));
+      });
+      break;
+    case 1:
+      isBasketModify = true;
+      removeClassBulk("#basket>.list-group-item", "pe-none");
+      addClassBulk("#basket>.list-group-item", "list-group-item-danger");
+      toggleProductsAvailable("disable");
+      [...basket.querySelectorAll("#checkbox")].forEach((e) => {
+        e.innerHTML = "";
+        e.append(cloneTemplate("basketUncheck"));
+      });
+      break;
+    default:
+      isBasketModify ? toggleBasketEditable("disable") : toggleBasketEditable("enable");
+      break;
+  }
+}
+function toggleModifyProduct(force = "") {
+  switch (["disable", "enable"].indexOf(force.toLowerCase())) {
+    case 0:
+      isProductModify = false;
+      removeClass("#s_main", "hidden");
+      addClass("#s_products", "hidden");
+      drawProducts();
+      break;
+    case 1:
+      isProductModify = true;
+      addClass("#s_main", "hidden");
+      removeClass("#s_products", "hidden");
+      drawProducts();
+      drawAllProducts();
+      break;
+    default:
+      isProductModify ? toggleModifyProduct("disable") : toggleModifyProduct("enable");
+      break;
+  }
+}
+function toggleEarnings(force = "") {
+  switch (["disable", "enable"].indexOf(force.toLowerCase())) {
+    case 0:
+      isEarnings = false;
+      removeClass("#s_main", "hidden");
+      addClass("#s_earnings", "hidden");
+      break;
+    case 1:
+      isEarnings = true;
+      addClass("#s_main", "hidden");
+      removeClass("#s_earnings", "hidden");
+      break;
+    default:
+      isEarnings ? toggleEarnings("disable") : toggleEarnings("enable");
+      break;
+  }
+}
+function toggleProductState(target) {
+  let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
+  console.log(target.parentElement.dataset);
+  if (target.classList.contains("btn-danger")) {
+    target.classList.remove("btn-danger");
+    target.classList.add("btn-success");
+    target.innerHTML = "";
+    target.append(cloneTemplate("productEnable"));
+    target.parentElement.querySelector("#productName").setAttribute("disabled", "");
+    target.parentElement.querySelector("#productPrice").setAttribute("disabled", "");
+    products[index][3] = false;
+  } else {
+    target.classList.remove("btn-success");
+    target.classList.add("btn-danger");
+    target.innerHTML = "";
+    target.append(cloneTemplate("productDisable"));
+    target.parentElement.querySelector("#productName").removeAttribute("disabled");
+    target.parentElement.querySelector("#productPrice").removeAttribute("disabled");
+    products[index][3] = true;
+  }
+  drawAllProducts();
+  saveData();
+}
+function editProductName(target) {
+  let val = target.value == "" ? randomName() : target.value;
+  let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
+  products[index][1] = val;
+  drawAllProducts();
+  saveData();
+}
+function editProductPrice(target) {
+  console.log(target.value);
+  let val = target.value == "" ? randomNumber(100, 900) : target.value;
+  let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
+  products[index][2] = Number(val);
+  drawAllProducts();
+  saveData();
 }
 
 function debug() {

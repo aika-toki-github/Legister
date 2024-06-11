@@ -8,6 +8,7 @@
 }
 html {
   overflow: hidden;
+  touch-action: manipulation;
 }
 body {
   overflow: hidden;
@@ -28,14 +29,15 @@ body {
     display: flex;
   }
 }
-#container {
+.window {
   width: 1440px;
   height: 900px;
   padding: 0;
 }
-#container > .Grid {
+.window > .Grid {
   height: 900px;
 }
+
 .trace {
   background-image: url(../16_20240524220654.png);
   background-size: cover;
@@ -129,4 +131,13 @@ body {
 .invisible {
   opacity: 0;
   pointer-events: none;
+}
+#checkbox > svg {
+  width: 40px;
+}
+.list-group-item-action {
+  cursor: pointer;
+}
+#f_allProducts {
+  font-size: 21px;
 }

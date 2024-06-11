@@ -135,3 +135,7 @@ function Searchs() {
   url.searchParams.forEach((v, k) => (b[k] = v));
   return b;
 }
+function arrayRemove(array, index) {
+  delete array[index];
+  return array.filter(Boolean);
+}

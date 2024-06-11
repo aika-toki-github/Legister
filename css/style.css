@@ -10,6 +10,7 @@
 
 html {
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 body {
@@ -35,13 +36,13 @@ body {
   display: flex;
 }
 
-#container {
+.window {
   width: 1440px;
   height: 900px;
   padding: 0;
 }
 
-#container > .Grid {
+.window > .Grid {
   height: 900px;
 }
 
@@ -151,4 +152,16 @@ body {
 .invisible {
   opacity: 0;
   pointer-events: none;
+}
+
+#checkbox > svg {
+  width: 40px;
+}
+
+.list-group-item-action {
+  cursor: pointer;
+}
+
+#f_allProducts {
+  font-size: 21px;
 }/*# sourceMappingURL=style.css.map */

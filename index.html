@@ -2,7 +2,7 @@
 <html lang="ja" data-bs-theme="">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Document</title>
     <link rel="stylesheet" href="./css/grdadv/grdadv.css" />
     <link href="./css/bootstrap-5.3.0/scss/bootstrap.min.css" rel="stylesheet" />
@@ -22,10 +22,7 @@
         <h4 class="text-body-secondary">端末、解像度、ブラウザの設定等をご確認ください。</h4>
       </div>
     </div>
-    <div class="container-fluid" id="container">
-      <!-- <div class="ol" style="/*display: none;*/">
-        <div class="trace"></div>
-      </div> -->
+    <div class="container-fluid window" id="s_main">
       <div class="Grid -stretch -between">
         <div class="Cell -29of60 no-border">
           <div class="Grid -stretch -vertical -full-h">
@@ -53,7 +50,7 @@
                     <div class="Cell -2of60 no-border keep-blank"></div>
                     <div class="btn btn-secondary Cell -3of12 flex-center border-5" id="b_checkout">会計</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
-                    <div class="btn btn-secondary Cell -3of12 -2lines flex-center border-5">商品<br />編集</div>
+                    <div class="btn btn-secondary Cell -3of12 -2lines flex-center border-5" id="b_modifyProduct">商品<br />編集</div>
                     <div class="Cell -2of60 no-border keep-blank"></div>
                   </div>
                 </div>
@@ -70,7 +67,7 @@
               <div class="Grid -middle -right -full-h" id="menu">
                 <div class="Cell -1of6 text-center border-5 btn btn-secondary hidden" id="b_debug">d</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
-                <div class="Cell -1of6 text-center border-5 btn btn-secondary">売上</div>
+                <div class="Cell -1of6 text-center border-5 btn btn-secondary" id="b_earnings">売上</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
                 <div class="Cell -1of6 text-center border-5 btn btn-secondary" id="b_new">新規</div>
                 <div class="Cell -2of60 no-border keep-blank"></div>
@@ -110,6 +107,58 @@
         </div>
       </div>
     </div>
+    <div class="container-fluid window hidden border" id="s_products">
+      <div class="Grid -vertical -full-h">
+        <div class="Cell -1of10">
+          <div class="Grid -left -stretch -full-h">
+            <div class="Cell -1of20 no-border btn btn-secondary m-2" id="b_backToMainFromProducts">
+              <div class="flex-center h-100 pe-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+              </div>
+            </div>
+            <div class="Cell -18of20 text-center no-border">商品編集</div>
+          </div>
+        </div>
+        <div class="Cell -fill overflow-y-auto">
+          <form class="form p-2" id="f_allProducts"></form>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid window hidden border border-danger" id="s_earnings">
+      <div class="Grid -vertical -full-h">
+        <div class="Cell -1of10">
+          <div class="Grid -left -stretch -full-h">
+            <div class="Cell -1of20 no-border btn btn-secondary m-2" id="b_backToMainFromEarnings">
+              <div class="flex-center h-100 pe-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+              </div>
+            </div>
+            <div class="Cell -18of20 text-center no-border">売上</div>
+          </div>
+        </div>
+        <div class="Cell -fill overflow-y-auto">
+          <div class="p-2">
+            <button class="btn btn-danger" type="button" style="font-size: 60px" id="b_reset">リセット</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <template id="productItem">
+      <div class="input-group mb-2 px-5" data-product-id="">
+        <input type="text" class="form-control" placeholder="" id="productName" />
+        <span class="input-group-text yen-symbol">¥</span>
+        <input type="number" class="form-control" placeholder="" id="productPrice" />
+        <button class="btn btn-danger" type="button" id="productState">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px" class="pe-none">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+          </svg>
+        </button>
+      </div>
+    </template>
     <template id="purchasableProductItem">
       <btn class="list-group-item list-group-item-action list-group-item-primary" data-product-id="">
         <div class="Grid -middle -between -full-w pe-none">
@@ -124,10 +173,10 @@
       </btn>
     </template>
     <template id="basketProductItem">
-      <div class="list-group-item">
-        <div class="Grid -middle -around">
-          <div class="Cell -1of20 no-border keep-blank flex-center" id="selectbox">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px">
+      <div class="list-group-item list-group-item-action pe-none" data-cache-id="">
+        <div class="Grid -middle -around pe-none">
+          <div class="Cell -1of20 no-border keep-blank flex-center" id="checkbox">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px" class="pe-none">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -140,6 +189,43 @@
           <div class="Cell -10of20 no-border keep-blank text-start on-multiple" id="count">2点</div>
           <div class="Cell -7of20 no-border keep-blank text-end on-multiple" id="productPrice">@1,234</div>
         </div>
+      </div>
+    </template>
+    <template id="basketLock">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+      </svg>
+    </template>
+    <template id="basketCheck">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+      </svg>
+    </template>
+    <template id="basketUncheck"
+      ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+      </svg>
+    </template>
+    <template id="productDisable">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px" class="pe-none">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+      </svg>
+    </template>
+    <template id="productEnable">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px" class="pe-none">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+    </template>
+    <template id="productAdd">
+      <div class="input-group mb-2 px-5">
+        <button class="btn btn-success" type="button" id="b_addProduct">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px" class="pe-none">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
       </div>
     </template>
     <script type="module" src="./js/material.mjs"></script>
