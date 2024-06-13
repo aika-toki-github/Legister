@@ -12,6 +12,7 @@ async function setup() {
     addClass("#overlay", "show");
     return false;
   }
+  initData();
   addClassBulk(".Cell:not(.no-border)", "border");
   // addClassBulk(".Cell:not(.no-border)", "border-secondary");
   document.querySelector("html").dataset.bsTheme = colorScheme("light", "dark");
@@ -22,15 +23,17 @@ async function setup() {
     "wheel",
     (e) => {
       !!(e.deltaY % 1) && e.preventDefault();
-    },
-    { passive: false }
+    }, {
+    passive: false
+  }
   );
   avoidBlank(".Cell:not([keep-blank]):not(.keep-blank)");
   dataSync();
   setInterval(dataSync, 1000 * 30);
   Searchs()["debug"] == "true" && removeClass("#b_debug", "hidden");
   b_addToBasket.addEventListener("click", addToBasket);
-  [...document.querySelectorAll(".numpad")].forEach((e) => e.addEventListener("click", (e) => inputNum(e.target.dataset.num)));
+  [...document.querySelectorAll(".numpad")].forEach((e) => e.addEventListener("click", (e) => inputNum(e.target
+    .dataset.num)));
   b_debug.addEventListener("click", debug);
   b_payment.addEventListener("click", payment);
   b_checkout.addEventListener("click", checkout);
@@ -56,6 +59,7 @@ async function setup() {
   buttonState("#b_new", false);
   buttonState("#b_cancel", false);
 }
+
 function dataSync() {
   Logger("Syncing data...");
   if (document.cookie == "") {
@@ -71,6 +75,7 @@ function dataSync() {
     Logger("Data is up-to-date.");
   }
 }
+
 function loadData() {
   products = JSON.parse(Cookies.get("products"));
   drawProducts();
@@ -80,13 +85,28 @@ function loadData() {
   drawBasket();
   Logger("Data loaded from storage.");
 }
+
 function saveData() {
-  Cookies.set("products", JSON.stringify(products), { expires: 100 });
-  Cookies.set("receipts", JSON.stringify(receipts), { expires: 100 });
-  Cookies.set("updatedAt", datetimeStr("e", new Date()), { expires: 100 });
+  Cookies.set("products", JSON.stringify(products), {
+    expires: 100
+  });
+  Cookies.set("receipts", JSON.stringify(receipts), {
+    expires: 100
+  });
+  Cookies.set("updatedAt", datetimeStr("e", new Date()), {
+    expires: 100
+  });
   Logger("Data saved to storage.");
   loadData();
 }
+
+function initData() {
+  products = [];
+  receipts = [];
+  basketProducts = [];
+  updatedAt = "1970-1-1-9-0-0";
+}
+
 function deleteData(param) {
   let c;
   if (param == "force") {
@@ -97,9 +117,15 @@ function deleteData(param) {
   if (c) {
     toggleEarnings("disable");
     Logger("Removing data from storage...", "warn");
-    Cookies.set("products", "", { expires: 0 });
-    Cookies.set("receipts", "", { expires: 0 });
-    Cookies.set("updatedAt", "", { expires: 0 });
+    Cookies.set("products", "", {
+      expires: 0
+    });
+    Cookies.set("receipts", "", {
+      expires: 0
+    });
+    Cookies.set("updatedAt", "", {
+      expires: 0
+    });
     Logger("Removing data from cache...", "warn");
     products = [];
     receipts = [];
@@ -109,10 +135,12 @@ function deleteData(param) {
     dataSync();
   }
 }
+
 function addProduct(name, price) {
   products.push([uuidv7(), name, price, true]);
   saveData();
 }
+
 function purchaseSelect(e) {
   if (e.dataset.productId == product.dataset.selectedId) {
     buttonState(".numpad,#b_addToBasket", false);
@@ -135,16 +163,17 @@ function purchaseSelect(e) {
   basketDisplay(false);
   // console.log(e);
 }
+
 function purchaseSelectionReset() {
-  product.querySelector(".active") &&
-    [...product.querySelectorAll(".active")].forEach((e) => {
-      e.classList.remove("active");
-      e.querySelector("#productPrice").textContent = e.querySelector("#productPrice").dataset.price;
-    });
+  product.querySelector(".active") && [...product.querySelectorAll(".active")].forEach((e) => {
+    e.classList.remove("active");
+    e.querySelector("#productPrice").textContent = e.querySelector("#productPrice").dataset.price;
+  });
   product.dataset.count = "";
   product.dataset.selectedId = "";
   numInputType = "none";
 }
+
 function basketSelect(e) {
   if (e.classList.contains("active")) {
     e.classList.remove("active");
@@ -157,6 +186,7 @@ function basketSelect(e) {
   e.querySelector("#checkbox").append(cloneTemplate("basketCheck"));
   // console.log(e);
 }
+
 function inputNum(num) {
   switch (numInputType) {
     case "count":
@@ -169,6 +199,7 @@ function inputNum(num) {
       break;
   }
 }
+
 function addToBasket() {
   let count = product.dataset.count ? Number(product.dataset.count) : 1;
   if (count > 50) {
@@ -189,8 +220,10 @@ function addToBasket() {
   buttonState("#b_payment", true);
   basketDisplay(true);
 }
+
 function drawProducts() {
-  document.querySelector("#product").hasChildNodes() && [...document.querySelector("#product").children].forEach((e) => e.remove());
+  document.querySelector("#product").hasChildNodes() && [...document.querySelector("#product").children].forEach((
+    e) => e.remove());
   products.forEach((e, i) => {
     let [id, name, price, enable] = e;
     if (enable) {
@@ -205,6 +238,7 @@ function drawProducts() {
   });
   purchaseSelectionReset();
 }
+
 function drawAllProducts() {
   f_allProducts.hasChildNodes() && [...f_allProducts.children].forEach((e) => e.remove());
   products.forEach((e, i) => {
@@ -237,10 +271,12 @@ function drawAllProducts() {
   addbutton.querySelector("#b_addProduct").addEventListener("click", addTemplateProduct);
   f_allProducts.append(addbutton);
 }
+
 function addTemplateProduct() {
   addProduct("商品名", 100);
   drawAllProducts();
 }
+
 function drawBasket() {
   basket.hasChildNodes() && [...basket.children].forEach((e) => e.remove());
   let _total = 0;
@@ -261,12 +297,18 @@ function drawBasket() {
   total.textContent = "¥" + _total.toLocaleString("en-us");
   receiptScroll();
 }
+
 function receiptScroll() {
-  receipt.scrollIntoView({ behavior: "smooth", block: "end" });
+  receipt.scrollIntoView({
+    behavior: "smooth",
+    block: "end"
+  });
 }
+
 function addExampleProduct(c = 1) {
   for (let i = 0; i < c; i++) addProduct(randomName(), randomNumber(10, 1200));
 }
+
 function payment() {
   if (isBasketModify) {
     [...basket.querySelectorAll(".active")].forEach((e) => {
@@ -292,6 +334,7 @@ function payment() {
     receiptScroll();
   }
 }
+
 function checkout() {
   let change = Number(t_payment.dataset.payment) - Number(total.dataset.total);
   if (change < 0) {
@@ -304,6 +347,7 @@ function checkout() {
   buttonState("#b_checkout,.numpad,#b_cancel", false);
   buttonState("#b_new", true);
 }
+
 function cancel() {
   switch (numInputType) {
     case "count":
@@ -322,11 +366,14 @@ function cancel() {
       break;
   }
 }
+
 function buttonState(target, state) {
   [...document.querySelectorAll(target)].forEach((e) => {
-    state ? e.classList.contains("disabled") && e.classList.remove("disabled") : e.classList.contains("disabled") || e.classList.add("disabled");
+    state ? e.classList.contains("disabled") && e.classList.remove("disabled") : e.classList.contains(
+      "disabled") || e.classList.add("disabled");
   });
 }
+
 function newPurchase() {
   receipts.push([uuidv7(), basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
   saveData();
@@ -339,6 +386,7 @@ function newPurchase() {
   receipt.querySelector(".change").classList.add("hidden");
   t_change.textContent = "¥" + Number(0).toLocaleString("en-us");
 }
+
 function basketDisplay(isbasket) {
   if (isbasket) {
     addClass("#b_cancel", "-\\2lines");
@@ -348,6 +396,7 @@ function basketDisplay(isbasket) {
     b_cancel.innerHTML = "取消";
   }
 }
+
 function toggleProductsAvailable(force = "") {
   switch (["disable", "enable"].indexOf(force.toLowerCase())) {
     case 0:
@@ -361,10 +410,12 @@ function toggleProductsAvailable(force = "") {
       addClassBulk("#product>.list-group-item", "list-group-item-primary");
       break;
     default:
-      product.querySelector(".list-group-item").classList.contains("pe-none") ? toggleProductsAvailable("enable") : toggleProductsAvailable("disable");
+      product.querySelector(".list-group-item").classList.contains("pe-none") ? toggleProductsAvailable(
+        "enable") : toggleProductsAvailable("disable");
       break;
   }
 }
+
 function toggleBasketEditable(force = "") {
   switch (["disable", "enable"].indexOf(force.toLowerCase())) {
     case 0:
@@ -393,6 +444,7 @@ function toggleBasketEditable(force = "") {
       break;
   }
 }
+
 function toggleModifyProduct(force = "") {
   switch (["disable", "enable"].indexOf(force.toLowerCase())) {
     case 0:
@@ -413,6 +465,7 @@ function toggleModifyProduct(force = "") {
       break;
   }
 }
+
 function toggleEarnings(force = "") {
   switch (["disable", "enable"].indexOf(force.toLowerCase())) {
     case 0:
@@ -430,6 +483,7 @@ function toggleEarnings(force = "") {
       break;
   }
 }
+
 function toggleProductState(target) {
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
   console.log(target.parentElement.dataset);
@@ -453,6 +507,7 @@ function toggleProductState(target) {
   drawAllProducts();
   saveData();
 }
+
 function editProductName(target) {
   let val = target.value == "" ? randomName() : target.value;
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
@@ -460,6 +515,7 @@ function editProductName(target) {
   drawAllProducts();
   saveData();
 }
+
 function editProductPrice(target) {
   console.log(target.value);
   let val = target.value == "" ? randomNumber(100, 900) : target.value;
@@ -468,6 +524,7 @@ function editProductPrice(target) {
   drawAllProducts();
   saveData();
 }
+
 function switchReceipt(dir = "f") {
   let currentReceiptIndex = receipts.findIndex((e) => e[0] == e_receipt.dataset.receiptId);
   if (dir == "f") {
@@ -481,8 +538,10 @@ function switchReceipt(dir = "f") {
   if (currentReceiptIndex >= receipts.length) currentReceiptIndex = 0;
   drawReceipt(currentReceiptIndex);
 }
+
 function drawReceipt(index) {
   let currentReceipt = receipts[index];
+  let _total = 0;
   e_receipt.dataset.receiptId = currentReceipt[0];
   e_products.innerHTML = "";
   currentReceipt[1].forEach((e) => {
@@ -490,8 +549,13 @@ function drawReceipt(index) {
     let product = products.find((v) => v[0] == e[0]);
     console.log(product);
     element.querySelector("#name").textContent = product[1];
-
+    element.querySelector("#price").textContent = "¥" + (e[1] * product[2]).toLocaleString("en-us");
+    element.querySelector("#count").textContent = e[1] + "点";
+    element.querySelector("#productPrice").textContent = "@" + product[2].toLocaleString("en-us");
+    element.dataset.cacheId = e[2];
+    if (e[1] == 1) [...element.querySelectorAll(".on-multiple")].forEach((e) => (e.style.display = "none"));
     e_products.append(element);
+    _total += e[1] * price;
   });
 }
 
