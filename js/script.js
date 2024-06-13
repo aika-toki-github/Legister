@@ -328,7 +328,7 @@ function buttonState(target, state) {
   });
 }
 function newPurchase() {
-  receipts.push([basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
+  receipts.push([uuidv7(), basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
   saveData();
   basketDisplay(true);
   buttonState("#b_cancel,#b_modifyProduct", true);
@@ -467,6 +467,32 @@ function editProductPrice(target) {
   products[index][2] = Number(val);
   drawAllProducts();
   saveData();
+}
+function switchReceipt(dir = "f") {
+  let currentReceiptIndex = receipts.findIndex((e) => e[0] == e_receipt.dataset.receiptId);
+  if (dir == "f") {
+    currentReceiptIndex++;
+  } else if (dir == "b") {
+    currentReceiptIndex--;
+  } else {
+    return switchReceipt();
+  }
+  if (currentReceiptIndex < 0) currentReceiptIndex = receipts.length - 1;
+  if (currentReceiptIndex >= receipts.length) currentReceiptIndex = 0;
+  drawReceipt(currentReceiptIndex);
+}
+function drawReceipt(index) {
+  let currentReceipt = receipts[index];
+  e_receipt.dataset.receiptId = currentReceipt[0];
+  e_products.innerHTML = "";
+  currentReceipt[1].forEach((e) => {
+    let element = cloneTemplate("basketProductItem");
+    let product = products.find((v) => v[0] == e[0]);
+    console.log(product);
+    element.querySelector("#name").textContent = product[1];
+
+    e_products.append(element);
+  });
 }
 
 function debug() {
