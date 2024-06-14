@@ -169,7 +169,6 @@ function purchaseSelect(e) {
   buttonState("#b_modifyProduct,#b_earnings", false);
   buttonState(".numpad,#b_addToBasket,#b_cancel", true);
   basketDisplay(false);
-  // console.log(e);
 }
 
 function purchaseSelectionReset() {
@@ -193,7 +192,6 @@ function basketSelect(e) {
   e.classList.add("active");
   e.querySelector("#checkbox").innerHTML = "";
   e.querySelector("#checkbox").append(cloneTemplate("basketCheck"));
-  // console.log(e);
 }
 
 function inputNum(num) {
@@ -519,7 +517,6 @@ function toggleEarnings(force = "") {
 
 function toggleProductState(target) {
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
-  console.log(target.parentElement);
   if (target.classList.contains("btn-danger")) {
     target.classList.remove("btn-danger");
     target.classList.add("btn-success");
@@ -546,7 +543,6 @@ function editProductName(target) {
 }
 
 function editProductPrice(target) {
-  console.log(target.value);
   let val = target.value == "" ? randomNumber(100, 900) : target.value;
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
   products[index][2] = Number(val);
@@ -593,7 +589,6 @@ function drawReceipt(index) {
   currentReceipt[1].forEach((e) => {
     let element = cloneTemplate("basketProductItem");
     let product = products.find((v) => v[0] == e[0]);
-    console.log(e);
     element.querySelector("#name").textContent = product[1];
     element.querySelector("#price").textContent = "¥" + (e[1] * product[2]).toLocaleString("en-us");
     element.querySelector("#count").textContent = e[1] + "点";
