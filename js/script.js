@@ -23,17 +23,17 @@ async function setup() {
     "wheel",
     (e) => {
       !!(e.deltaY % 1) && e.preventDefault();
-    }, {
-    passive: false
-  }
+    },
+    {
+      passive: false,
+    }
   );
   avoidBlank(".Cell:not([keep-blank]):not(.keep-blank)");
   dataSync();
   setInterval(dataSync, 1000 * 30);
   Searchs()["debug"] == "true" && removeClass("#b_debug", "hidden");
   b_addToBasket.addEventListener("click", addToBasket);
-  [...document.querySelectorAll(".numpad")].forEach((e) => e.addEventListener("click", (e) => inputNum(e.target
-    .dataset.num)));
+  [...document.querySelectorAll(".numpad")].forEach((e) => e.addEventListener("click", (e) => inputNum(e.target.dataset.num)));
   b_debug.addEventListener("click", debug);
   b_payment.addEventListener("click", payment);
   b_checkout.addEventListener("click", checkout);
@@ -52,12 +52,19 @@ async function setup() {
   b_backToMainFromEarnings.addEventListener("click", (_) => {
     toggleEarnings("disable");
   });
+  b_receiptForward.addEventListener("click", () => {
+    switchReceipt("f");
+  });
+  b_receiptBackward.addEventListener("click", () => {
+    switchReceipt("b");
+  });
   buttonState(".numpad", false);
   buttonState("#b_addToBasket", false);
   buttonState("#b_checkout", false);
   buttonState("#b_payment", false);
   buttonState("#b_new", false);
   buttonState("#b_cancel", false);
+  drawReceipt(receipts.length - 1);
 }
 
 function dataSync() {
@@ -88,13 +95,13 @@ function loadData() {
 
 function saveData() {
   Cookies.set("products", JSON.stringify(products), {
-    expires: 100
+    expires: 100,
   });
   Cookies.set("receipts", JSON.stringify(receipts), {
-    expires: 100
+    expires: 100,
   });
   Cookies.set("updatedAt", datetimeStr("e", new Date()), {
-    expires: 100
+    expires: 100,
   });
   Logger("Data saved to storage.");
   loadData();
@@ -118,13 +125,13 @@ function deleteData(param) {
     toggleEarnings("disable");
     Logger("Removing data from storage...", "warn");
     Cookies.set("products", "", {
-      expires: 0
+      expires: 0,
     });
     Cookies.set("receipts", "", {
-      expires: 0
+      expires: 0,
     });
     Cookies.set("updatedAt", "", {
-      expires: 0
+      expires: 0,
     });
     Logger("Removing data from cache...", "warn");
     products = [];
@@ -133,6 +140,7 @@ function deleteData(param) {
     updatedAt = "1970-1-1-9-0-0";
     Logger("Initialization completed.", "warn");
     dataSync();
+    location.reload();
   }
 }
 
@@ -145,7 +153,7 @@ function purchaseSelect(e) {
   if (e.dataset.productId == product.dataset.selectedId) {
     buttonState(".numpad,#b_addToBasket", false);
     if (basketProducts.length == 0) {
-      buttonState("#b_modifyProduct", true);
+      buttonState("#b_modifyProduct,#b_earnings", true);
       buttonState("#b_cancel", false);
     }
     purchaseSelectionReset();
@@ -158,17 +166,18 @@ function purchaseSelect(e) {
   product.dataset.selectedId = e.dataset.productId;
   e.querySelector("#productPrice").textContent = 1;
   numInputType = "count";
-  buttonState("#b_modifyProduct", false);
+  buttonState("#b_modifyProduct,#b_earnings", false);
   buttonState(".numpad,#b_addToBasket,#b_cancel", true);
   basketDisplay(false);
   // console.log(e);
 }
 
 function purchaseSelectionReset() {
-  product.querySelector(".active") && [...product.querySelectorAll(".active")].forEach((e) => {
-    e.classList.remove("active");
-    e.querySelector("#productPrice").textContent = e.querySelector("#productPrice").dataset.price;
-  });
+  product.querySelector(".active") &&
+    [...product.querySelectorAll(".active")].forEach((e) => {
+      e.classList.remove("active");
+      e.querySelector("#productPrice").textContent = e.querySelector("#productPrice").dataset.price;
+    });
   product.dataset.count = "";
   product.dataset.selectedId = "";
   numInputType = "none";
@@ -222,8 +231,7 @@ function addToBasket() {
 }
 
 function drawProducts() {
-  document.querySelector("#product").hasChildNodes() && [...document.querySelector("#product").children].forEach((
-    e) => e.remove());
+  document.querySelector("#product").hasChildNodes() && [...document.querySelector("#product").children].forEach((e) => e.remove());
   products.forEach((e, i) => {
     let [id, name, price, enable] = e;
     if (enable) {
@@ -252,18 +260,20 @@ function drawAllProducts() {
     });
     element.querySelector("#productName").addEventListener("change", (e) => editProductName(e.target));
     element.querySelector("#productPrice").addEventListener("change", (e) => editProductPrice(e.target));
+    element.querySelector("#productName").setAttribute("disabled", "");
+    element.querySelector("#productPrice").setAttribute("disabled", "");
     if (!enable) {
       element.querySelector("#productState").classList.remove("btn-danger");
       element.querySelector("#productState").classList.add("btn-success");
       element.querySelector("#productState").innerHTML = "";
       element.querySelector("#productState").append(cloneTemplate("productEnable"));
-      element.querySelector("#productName").setAttribute("disabled", "");
-      element.querySelector("#productPrice").setAttribute("disabled", "");
+      element.classList.add("disabled");
     } else {
       element.querySelector("#productState").classList.remove("btn-success");
       element.querySelector("#productState").classList.add("btn-danger");
       element.querySelector("#productState").innerHTML = "";
       element.querySelector("#productState").append(cloneTemplate("productDisable"));
+      element.classList.remove("disabled");
     }
     f_allProducts.append(element);
   });
@@ -274,7 +284,29 @@ function drawAllProducts() {
 
 function addTemplateProduct() {
   addProduct("商品名", 100);
-  drawAllProducts();
+  let [id, name, price, enable] = products[products.length - 1];
+  let element = cloneTemplate("productItem");
+  element.querySelector("#productName").value = name;
+  element.querySelector("#productPrice").value = price;
+  element.dataset.productId = id;
+  element.querySelector("#productState").addEventListener("click", (e) => {
+    toggleProductState(e.target);
+  });
+  element.querySelector("#productName").addEventListener("change", (e) => editProductName(e.target));
+  element.querySelector("#productPrice").addEventListener("change", (e) => editProductPrice(e.target));
+  if (!enable) {
+    element.querySelector("#productState").classList.remove("btn-danger");
+    element.querySelector("#productState").classList.add("btn-success");
+    element.querySelector("#productState").innerHTML = "";
+    element.querySelector("#productState").append(cloneTemplate("productEnable"));
+  } else {
+    element.querySelector("#productState").classList.remove("btn-success");
+    element.querySelector("#productState").classList.add("btn-danger");
+    element.querySelector("#productState").innerHTML = "";
+    element.querySelector("#productState").append(cloneTemplate("productDisable"));
+  }
+  b_addProduct.parentElement.before(element);
+  saveData();
 }
 
 function drawBasket() {
@@ -301,7 +333,7 @@ function drawBasket() {
 function receiptScroll() {
   receipt.scrollIntoView({
     behavior: "smooth",
-    block: "end"
+    block: "end",
   });
 }
 
@@ -321,7 +353,7 @@ function payment() {
     toggleBasketEditable("disable");
     if (basketProducts.length == 0) {
       buttonState("#b_cancel,#b_payment", false);
-      buttonState("#b_modifyProduct", true);
+      buttonState("#b_modifyProduct,#b_earnings", true);
     }
   } else {
     numInputType = "payment";
@@ -369,8 +401,7 @@ function cancel() {
 
 function buttonState(target, state) {
   [...document.querySelectorAll(target)].forEach((e) => {
-    state ? e.classList.contains("disabled") && e.classList.remove("disabled") : e.classList.contains(
-      "disabled") || e.classList.add("disabled");
+    state ? e.classList.contains("disabled") && e.classList.remove("disabled") : e.classList.contains("disabled") || e.classList.add("disabled");
   });
 }
 
@@ -378,13 +409,14 @@ function newPurchase() {
   receipts.push([uuidv7(), basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
   saveData();
   basketDisplay(true);
-  buttonState("#b_cancel,#b_modifyProduct", true);
+  buttonState("#b_cancel,#b_modifyProduct,#b_earnings", true);
   buttonState("#b_new,#b_cancel", false);
   receipt.querySelector(".payment").classList.add("hidden");
   t_payment.dataset.payment = "";
   t_payment.textContent = "¥" + Number(0).toLocaleString("en-us");
   receipt.querySelector(".change").classList.add("hidden");
   t_change.textContent = "¥" + Number(0).toLocaleString("en-us");
+  drawReceipt[receipts.length - 1];
 }
 
 function basketDisplay(isbasket) {
@@ -410,8 +442,7 @@ function toggleProductsAvailable(force = "") {
       addClassBulk("#product>.list-group-item", "list-group-item-primary");
       break;
     default:
-      product.querySelector(".list-group-item").classList.contains("pe-none") ? toggleProductsAvailable(
-        "enable") : toggleProductsAvailable("disable");
+      product.querySelector(".list-group-item").classList.contains("pe-none") ? toggleProductsAvailable("enable") : toggleProductsAvailable("disable");
       break;
   }
 }
@@ -452,6 +483,7 @@ function toggleModifyProduct(force = "") {
       removeClass("#s_main", "hidden");
       addClass("#s_products", "hidden");
       drawProducts();
+      drawAllProducts();
       break;
     case 1:
       isProductModify = true;
@@ -477,6 +509,7 @@ function toggleEarnings(force = "") {
       isEarnings = true;
       addClass("#s_main", "hidden");
       removeClass("#s_earnings", "hidden");
+      drawReceipt(receipts.length - 1);
       break;
     default:
       isEarnings ? toggleEarnings("disable") : toggleEarnings("enable");
@@ -486,25 +519,22 @@ function toggleEarnings(force = "") {
 
 function toggleProductState(target) {
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
-  console.log(target.parentElement.dataset);
+  console.log(target.parentElement);
   if (target.classList.contains("btn-danger")) {
     target.classList.remove("btn-danger");
     target.classList.add("btn-success");
+    target.parentElement.classList.add("disabled");
     target.innerHTML = "";
     target.append(cloneTemplate("productEnable"));
-    target.parentElement.querySelector("#productName").setAttribute("disabled", "");
-    target.parentElement.querySelector("#productPrice").setAttribute("disabled", "");
     products[index][3] = false;
   } else {
     target.classList.remove("btn-success");
     target.classList.add("btn-danger");
+    target.parentElement.classList.remove("disabled");
     target.innerHTML = "";
     target.append(cloneTemplate("productDisable"));
-    target.parentElement.querySelector("#productName").removeAttribute("disabled");
-    target.parentElement.querySelector("#productPrice").removeAttribute("disabled");
     products[index][3] = true;
   }
-  drawAllProducts();
   saveData();
 }
 
@@ -512,7 +542,6 @@ function editProductName(target) {
   let val = target.value == "" ? randomName() : target.value;
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
   products[index][1] = val;
-  drawAllProducts();
   saveData();
 }
 
@@ -521,7 +550,6 @@ function editProductPrice(target) {
   let val = target.value == "" ? randomNumber(100, 900) : target.value;
   let index = products.findIndex((v) => v[0] == target.parentElement.dataset.productId);
   products[index][2] = Number(val);
-  drawAllProducts();
   saveData();
 }
 
@@ -540,22 +568,44 @@ function switchReceipt(dir = "f") {
 }
 
 function drawReceipt(index) {
+  if (receipts.length == 0) {
+    receiptPagination.textContent = "0 / 0";
+    return (e_products.innerHTML = "<span>データなし</span>");
+  }
   let currentReceipt = receipts[index];
+  receiptPagination.textContent = [index + 1, receipts.length].join(" / ");
+  checkoutCount.textContent = receipts.length.toLocaleString("en-us") + "回";
+  let _totalEarning = 0;
+  _totalEarning = receipts
+    .map((e) => {
+      let _total = 0;
+      e[1].forEach((a) => {
+        let p = products.find((v) => v[0] == a[0]);
+        _total += a[1] * p[2];
+      });
+      return _total;
+    })
+    .reduce((acc, crr) => acc + crr, _totalEarning);
+  totalEarning.textContent = "¥" + _totalEarning.toLocaleString("en-us");
   let _total = 0;
   e_receipt.dataset.receiptId = currentReceipt[0];
   e_products.innerHTML = "";
   currentReceipt[1].forEach((e) => {
     let element = cloneTemplate("basketProductItem");
     let product = products.find((v) => v[0] == e[0]);
-    console.log(product);
+    console.log(e);
     element.querySelector("#name").textContent = product[1];
     element.querySelector("#price").textContent = "¥" + (e[1] * product[2]).toLocaleString("en-us");
     element.querySelector("#count").textContent = e[1] + "点";
     element.querySelector("#productPrice").textContent = "@" + product[2].toLocaleString("en-us");
     element.dataset.cacheId = e[2];
     if (e[1] == 1) [...element.querySelectorAll(".on-multiple")].forEach((e) => (e.style.display = "none"));
+    element.querySelector("#checkbox").innerHTML = "";
     e_products.append(element);
-    _total += e[1] * price;
+    _total += e[1] * product[2];
+    e_total.textContent = "¥" + _total.toLocaleString("en-us");
+    e_payment.textContent = "¥" + currentReceipt[2].toLocaleString("en-us");
+    e_change.textContent = "¥" + (currentReceipt[2] - _total).toLocaleString("en-us");
   });
 }
 

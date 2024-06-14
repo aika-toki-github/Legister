@@ -144,3 +144,9 @@ body {
 #e_receipt {
   width: 670px;
 }
+.size-6 {
+  width: 40px;
+}
+.input-group.disabled > .form-control {
+  opacity: 0.5;
+}

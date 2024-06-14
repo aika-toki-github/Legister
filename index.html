@@ -126,7 +126,7 @@
         </div>
       </div>
     </div>
-    <div class="container-fluid window hidden border border-danger" id="s_earnings">
+    <div class="container-fluid window hidden border" id="s_earnings">
       <div class="Grid -vertical -full-h">
         <div class="Cell -1of10">
           <div class="Grid -left -stretch -full-h">
@@ -140,13 +140,40 @@
             <div class="Cell -18of20 text-center no-border">売上</div>
           </div>
         </div>
-        <div class="Cell -fill overflow-y-auto">
-          <div class="p-2 Grid">
+        <div class="Cell -fill">
+          <div class="p-2 Grid h-100">
             <div class="Cell -1of2 no-border">
-              <button class="btn btn-danger" type="button" style="font-size: 60px" id="b_reset">リセット</button>
+              <div class="Grid -full-h -bottom -around">
+                <div class="Cell -1of1 no-border flex-center">
+                  <button class="btn btn-danger" type="button" style="font-size: 60px" id="b_reset">リセット</button>
+                </div>
+                <div class="Cell -1of1 no-border">
+                  <span class="text-start">総合売上：</span>
+                  <span class="text-end" id="totalEarning">¥0</span>
+                </div>
+                <div class="Cell -1of1 no-border">
+                  <span class="text-start">会計回数：</span>
+                  <span class="text-end" id="checkoutCount">0回</span>
+                </div>
+                <div class="Cell -1of1 no-border">
+                  <div class="Grid -around -stretch -full-h">
+                    <button class="btn btn-primary" type="button" id="b_receiptBackward">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                      </svg>
+                    </button>
+                    <span id="receiptPagination" class="text-center">0 / 0</span>
+                    <button class="btn btn-primary" type="button" id="b_receiptForward">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="Cell -1of2 no-border">
-              <div class="list-group list-group-flush mx-4 border border-3" style="--bs-list-group-border-width: 0" id="e_receipt" data-receipt-id="">
+            <div class="Cell -1of2 no-border overflow-y-auto mh-100">
+              <div class="list-group list-group-flush m-4 border border-3" style="--bs-list-group-border-width: 0" id="e_receipt" data-receipt-id="">
                 <div class="list-group-item">
                   <div class="list-group list-group-flush mh-100" style="--bs-list-group-border-width: 0" id="e_products"></div>
                 </div>
