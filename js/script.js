@@ -3,7 +3,7 @@ let isBasketModify = false;
 let isProductModify = false;
 let isEarnings = false;
 let products = [];
-let receipts = [];
+let receipts = [0, 0, []];
 let basketProducts = [];
 let updatedAt = "1970-1-1-9-0-0";
 window.onload = setup();
@@ -64,7 +64,7 @@ async function setup() {
   buttonState("#b_payment", false);
   buttonState("#b_new", false);
   buttonState("#b_cancel", false);
-  drawReceipt(receipts.length - 1);
+  drawReceipt(receipts[2].length - 1);
 }
 
 function dataSync() {
@@ -109,7 +109,7 @@ function saveData() {
 
 function initData() {
   products = [];
-  receipts = [];
+  receipts = [0, 0, []];
   basketProducts = [];
   updatedAt = "1970-1-1-9-0-0";
 }
@@ -135,7 +135,7 @@ function deleteData(param) {
     });
     Logger("Removing data from cache...", "warn");
     products = [];
-    receipts = [];
+    receipts = [0, 0, []];
     basketProducts = [];
     updatedAt = "1970-1-1-9-0-0";
     Logger("Initialization completed.", "warn");
@@ -404,7 +404,12 @@ function buttonState(target, state) {
 }
 
 function newPurchase() {
-  receipts.push([uuidv7(), basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
+  receipts[2].length > 9 && receipts[2].shift();
+  receipts[2].push([uuidv7(), basketProducts.map((e) => (e = arrayRemove(e, 2))), Number(t_payment.dataset.payment)]);
+  let _total = receipts[0];
+  let count = receipts[1] + 1;
+  receipts[1] = count;
+  receipts[0] = Number(total.dataset.total) + _total;
   saveData();
   basketDisplay(true);
   buttonState("#b_cancel,#b_modifyProduct,#b_earnings", true);
@@ -414,7 +419,7 @@ function newPurchase() {
   t_payment.textContent = "¥" + Number(0).toLocaleString("en-us");
   receipt.querySelector(".change").classList.add("hidden");
   t_change.textContent = "¥" + Number(0).toLocaleString("en-us");
-  drawReceipt[receipts.length - 1];
+  drawReceipt[receipts[2].length - 1];
 }
 
 function basketDisplay(isbasket) {
@@ -507,7 +512,7 @@ function toggleEarnings(force = "") {
       isEarnings = true;
       addClass("#s_main", "hidden");
       removeClass("#s_earnings", "hidden");
-      drawReceipt(receipts.length - 1);
+      drawReceipt(receipts[2].length - 1);
       break;
     default:
       isEarnings ? toggleEarnings("disable") : toggleEarnings("enable");
@@ -550,7 +555,7 @@ function editProductPrice(target) {
 }
 
 function switchReceipt(dir = "f") {
-  let currentReceiptIndex = receipts.findIndex((e) => e[0] == e_receipt.dataset.receiptId);
+  let currentReceiptIndex = receipts[2].findIndex((e) => e[0] == e_receipt.dataset.receiptId);
   if (dir == "f") {
     currentReceiptIndex++;
   } else if (dir == "b") {
@@ -558,21 +563,22 @@ function switchReceipt(dir = "f") {
   } else {
     return switchReceipt();
   }
-  if (currentReceiptIndex < 0) currentReceiptIndex = receipts.length - 1;
-  if (currentReceiptIndex >= receipts.length) currentReceiptIndex = 0;
+  if (currentReceiptIndex < 0) currentReceiptIndex = receipts[2].length - 1;
+  if (currentReceiptIndex >= receipts[2].length) currentReceiptIndex = 0;
   drawReceipt(currentReceiptIndex);
 }
 
 function drawReceipt(index) {
-  if (receipts.length == 0) {
+  if (receipts[2].length == 0) {
     receiptPagination.textContent = "0 / 0";
     return (e_products.innerHTML = "<span>データなし</span>");
   }
-  let currentReceipt = receipts[index];
-  receiptPagination.textContent = [index + 1, receipts.length].join(" / ");
-  checkoutCount.textContent = receipts.length.toLocaleString("en-us") + "回";
+  let currentReceipt = receipts[2][index];
+  receiptPagination.textContent = [index + 1, receipts[2].length].join(" / ");
+  // checkoutCount.textContent = receipts[2].length.toLocaleString("en-us") + "回";
+  checkoutCount.textContent = receipts[1].toLocaleString("en-us") + "回";
   let _totalEarning = 0;
-  _totalEarning = receipts
+  _totalEarning = receipts[2]
     .map((e) => {
       let _total = 0;
       e[1].forEach((a) => {
@@ -582,7 +588,8 @@ function drawReceipt(index) {
       return _total;
     })
     .reduce((acc, crr) => acc + crr, _totalEarning);
-  totalEarning.textContent = "¥" + _totalEarning.toLocaleString("en-us");
+  // totalEarning.textContent = "¥" + _totalEarning.toLocaleString("en-us");
+  totalEarning.textContent = "¥" + receipts[0].toLocaleString("en-us");
   let _total = 0;
   e_receipt.dataset.receiptId = currentReceipt[0];
   e_products.innerHTML = "";
@@ -612,4 +619,25 @@ function debug() {
     purchaseSelect(e);
     addToBasket();
   });
+}
+
+function receiptDebug() {
+  let a = Math.ceil(Math.random() * 10);
+  for (let i = 0; i < a; i++) {
+    let b = [...product.children][Math.floor(Math.random() * [...product.children].length)];
+    purchaseSelect(b);
+    product.dataset.count = Math.ceil(Math.random() * 10);
+    addToBasket();
+  }
+  payment();
+  t_payment.dataset.payment = Number(total.dataset.total) + Math.floor(Math.random() * 1500);
+  checkout();
+  newPurchase();
+}
+
+function multipleReceiptDebug(c) {
+  for (let i = 0; i < c; i++) {
+    receiptDebug();
+  }
+  Logger("Added " + c + " random receipt");
 }
