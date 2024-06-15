@@ -633,6 +633,7 @@ function receiptDebug() {
   t_payment.dataset.payment = Number(total.dataset.total) + Math.floor(Math.random() * 1500);
   checkout();
   newPurchase();
+  toggleEarnings("enable");
 }
 
 function multipleReceiptDebug(c) {
